@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/talkative-fairy-tale-front/static/css/main.2b84f3c2.css",
+    "main.js": "/talkative-fairy-tale-front/static/js/main.dcc149b3.js",
+    "index.html": "/talkative-fairy-tale-front/index.html",
+    "main.2b84f3c2.css.map": "/talkative-fairy-tale-front/static/css/main.2b84f3c2.css.map",
+    "main.dcc149b3.js.map": "/talkative-fairy-tale-front/static/js/main.dcc149b3.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2b84f3c2.css",
+    "static/js/main.dcc149b3.js"
+  ]
+}
