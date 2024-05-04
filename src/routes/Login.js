@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     // 상태 변수 정의
     const [authCode, setAuthCode] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     // 입력값 변경 시 처리 함수
     const handleChange = (event) => {
@@ -17,8 +19,9 @@ const Login = () => {
         // 여기에 로그인 처리 로직 추가
         // 영문자와 숫자로 이루어진 6자리 문자열인지 검사
         if (/^[A-Za-z0-9]{6}$/.test(authCode) || authCode === '') {
-            alert(`사용자 인증 코드: ${authCode}`);
+            alert("환영합니다!");
             setError(''); // 성공한 경우 에러 메시지를 초기화합니다.
+            navigate('/home');
         } else {
             setError('영문자와 숫자만 사용하여 6자리를 입력해주세요.');
             setAuthCode('');
