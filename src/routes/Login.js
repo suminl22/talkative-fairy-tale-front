@@ -7,22 +7,22 @@ const Login = () => {
     const [error, setError] = useState('');
 
     // 입력값 변경 시 처리 함수
-    const handleChange = (e) => {
-        const { value } = e.target;
-        // 영문자와 숫자로 이루어진 6자리 문자열인지 검사
-        if (/^[A-Za-z0-9]{6}$/.test(value) || value === '') {
-            setAuthCode(value);
-            setError(''); // 에러 메시지 초기화
-        } else {
-            setError('영문자와 숫자만 사용하여 6자리를 입력해주세요.');
-        }
+    const handleChange = (event) => {
+        setAuthCode(event.target.value);
     };
 
     // 폼 제출 시 처리 함수
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
         // 여기에 로그인 처리 로직 추가
-        alert(`사용자 인증 코드: ${authCode}`);
+        // 영문자와 숫자로 이루어진 6자리 문자열인지 검사
+        if (/^[A-Za-z0-9]{6}$/.test(authCode) || authCode === '') {
+            alert(`사용자 인증 코드: ${authCode}`);
+            setError(''); // 성공한 경우 에러 메시지를 초기화합니다.
+        } else {
+            setError('영문자와 숫자만 사용하여 6자리를 입력해주세요.');
+            setAuthCode('');
+        }
     };
 
     return (
