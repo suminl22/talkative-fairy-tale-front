@@ -30,27 +30,28 @@ function Body() {
 
   return (
     <>
-      {/* Tabbar */}
-    <div className="container mt-1" style={{ paddingTop: '20px' }}>
-        <ul className="nav nav-tabs" style={{ width: '100%', display: 'flex' }}>
-            <li className="nav-item" style={{ flex: '1' }}>
-            <button className={`nav-link ${activeTab === '작성중' ? 'active' : ''}`} onClick={() => handleTabClick('작성중')} style={{ backgroundColor: activeTab === '작성중' ? '#FCF06E' : 'white', color: 'black', width: '90%', fontWeight: activeTab === '작성완료' ? 'normal' : 'bold', margin: '0 auto' }}>작성중</button>
-            </li>
-            <li className="nav-item" style={{ flex: '1' }}>
-            <button className={`nav-link ${activeTab === '작성완료' ? 'active' : ''}`} onClick={() => handleTabClick('작성완료')} style={{ backgroundColor: activeTab === '작성완료' ? '#FCF06E' : 'white', color: 'black', width: '90%', fontWeight: activeTab === '작성완료' ? 'bold' : 'normal', margin: '0 auto' }}>작성완료</button>
-            </li>
-        </ul>
-    </div>
-      {/* Section*/}
-      <section className="py-5">
-        <div className="container px-4 px-lg-5 mt-1">
-          <div className="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-center">
-            {renderBooks()}
-          </div>
+        {/* Tabbar */}
+        <div className="container mt-1" style={{ paddingTop: '20px' }}>
+            <ul className="nav nav-tabs" style={{ width: '100%', display: 'flex' }}>
+                <li className="nav-item" style={{ flex: '1' }}>
+                    <button className={`nav-link ${activeTab === '작성중' ? 'active' : ''}`} onClick={() => handleTabClick('작성중')} style={{ backgroundColor: activeTab === '작성중' ? '#FCF06E' : 'white', color: 'black', width: '90%', fontWeight: activeTab === '작성완료' ? 'normal' : 'bold', margin: '0 auto' }}>작성중</button>
+                </li>
+                <li className="nav-item" style={{ flex: '1' }}>
+                    <button className={`nav-link ${activeTab === '작성완료' ? 'active' : ''}`} onClick={() => handleTabClick('작성완료')} style={{ backgroundColor: activeTab === '작성완료' ? '#FCF06E' : 'white', color: 'black', width: '90%', fontWeight: activeTab === '작성완료' ? 'bold' : 'normal', margin: '0 auto' }}>작성완료</button>
+                </li>
+            </ul>
         </div>
-      </section>
+        {/* Section*/}
+        <section className="py-5">
+            <div className="container px-4 px-lg-5 mt-1">
+                <div className="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-start">
+                    {renderBooks()}
+                </div>
+            </div>
+        </section>
     </>
   );
+
 }
 
 export default Body;

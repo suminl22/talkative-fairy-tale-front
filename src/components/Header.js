@@ -10,7 +10,7 @@ function Header() {
                     <p className="lead fw-normal text-grey-50 mb-0">
                         생성형 이야기 챗봇 '야기'과 함께
                     </p>
-                    <p className="lead fw-normal text-grey-50 mb-4">
+                    <p className="lead fw-normal text-grey-50 mb-5">
                         세상에 단 하나 뿐인 나만의 동화책을 만들어보세요!
                     </p>
                     {/* 이야기 시작하기 버튼 */}
