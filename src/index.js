@@ -8,6 +8,7 @@ import {
 import Login from "./routes/Login";
 import SignUp from './routes/SignUp';
 import Home from './routes/Home';
+import Chat from './routes/Chat';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -29,6 +30,12 @@ const router = createBrowserRouter([
       <Home />
     ),
   },
+  {
+    path: "/chat",
+    element: (
+      <Chat />
+    )
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

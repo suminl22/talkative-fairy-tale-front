@@ -12,11 +12,17 @@ body {
   align-items: center;
 }
 
-code {
+/* code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
+} */
 
 * {
   box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "HakgyoansimKossuyeomR";
+  font-weight: normal;
+  src: url("./fonts/HakgyoansimKossuyeomR.ttf") format("truetype");
 }
