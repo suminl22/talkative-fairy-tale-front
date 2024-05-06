@@ -4,13 +4,12 @@ import Book from '../components/Book';
 import { useNavigate } from "react-router-dom";
 
 function Home(){
-    const numOfBooks = 6;
 
     const books = [];
 
-    for (let i = 0; i < numOfBooks; i++) {
-        books.push(<div className="col mb-5" key={i}><Book /></div>);
-    }
+    books.push(<div className="col mb-5" key={0}><Book action="create" /></div>);
+    books.push(<div className="col mb-5" key={1}><Book action="edit" /></div>);
+    books.push(<div className="col mb-5" key={2}><Book action="read" /></div>);
 
     return (
         <>
