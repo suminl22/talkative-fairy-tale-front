@@ -1,27 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ChatBubble from '../components/ChatBubble';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
+    const [messages, setMessages] = useState([]);
     const messagesRef = useRef(null);
 
-    const handleScroll = () => {
-        const messages = document.querySelectorAll('.message');
-        messages.forEach(msg => {
-            if (isElementInViewport(msg)) {
-                msg.classList.remove('fading-out');
-            } else {
-                msg.classList.add('fading-out');
-            }
-        });
-    };
-    
     useEffect(() => {
+        const handleScroll = () => {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(msg => {
+                if (isElementInViewport(msg)) {
+                    msg.classList.remove('fading-out');
+                } else {
+                    msg.classList.add('fading-out');
+                }
+            });
+        };
+        
         const messagesRefCopy = messagesRef.current;
         messagesRefCopy.addEventListener('scroll', handleScroll);
         return () => {
             messagesRefCopy.removeEventListener('scroll', handleScroll);
         };
-    }, [handleScroll]); // handleScroll 함수를 의존성 배열에 추가함
+    }, []); // 빈 배열을 전달하여 최초 렌더링 시에만 실행
 
     const handleCompositionStart = () => {
         setIsComposing(true);
@@ -66,50 +68,25 @@ function Chat() {
         const input = document.getElementById('message-input');
         const messageText = input.value.trim();
         if (messageText !== '') {
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user-message';
-            userMsg.innerText = '';
-            messagesRef.current.appendChild(userMsg);
-
-            let i = 0;
-            const typeWriter = () => {
-                if (i < messageText.length) {
-                    userMsg.textContent += messageText.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 10);
-                } else {
-                    simulateComputerResponse(messageText);
-                }
-            };
-            typeWriter();
-
-            userMsg.scrollIntoView({ behavior: 'smooth' });
+            // 사용자의 메시지를 추가합니다.
+            const userMessage = { text: messageText, isUser: true };
+            setMessages(prevMessages => [...prevMessages, userMessage]);
+    
+            // 가짜 응답을 추가합니다.
+            simulateComputerResponse(messageText);
+    
             input.value = '';
         }
     };
-
+    
     const simulateComputerResponse = (inputText) => {
         const length = inputText.length;
         const simulatedText = '가짜 응답 '.repeat(Math.ceil(length / 6)).trim();
-
-        const computerMsg = document.createElement('div');
-        computerMsg.className = 'message computer-message';
-        computerMsg.innerText = '';
-        messagesRef.current.appendChild(computerMsg);
-
-        let i = 0;
-        const typeWriter = () => {
-            if (i < simulatedText.length) {
-                computerMsg.innerHTML += simulatedText.charAt(i);
-                i++;
-                setTimeout(typeWriter, 10);
-            }
-        };
-        typeWriter();
-
-        computerMsg.scrollIntoView({ behavior: 'smooth' });
+    
+        // 가짜 응답을 생성하여 추가합니다.
+        const computerMessage = { text: simulatedText, isUser: false };
+        setMessages(prevMessages => [...prevMessages, computerMessage]);
     };
-
     const isElementInViewport = (el) => {
         const rect = el.getBoundingClientRect();
         return (
@@ -119,13 +96,15 @@ function Chat() {
     };
 
     return (
-        <div id="container" >
-            <div id="sidebar">
-                <button className="nav-button">Home</button>
-                <button className="nav-button">Settings</button>
+        <div id="container" style={{ backgroundColor: '#FFD700' }}>
+            <div id="sidebar" style={{ height: '50vh', overflowY: 'auto' }}>
+                <button className="nav-button">홈</button>
+                <button className="nav-button">설정</button>
             </div>
             <div id="chat-area" ref={messagesRef} style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
-                <div id="chat-messages"></div>
+                {messages.map((message, index) => (
+                    <ChatBubble key={index} message={message.text} isUser={message.isUser} />
+                ))}
             </div>
             <div id="input-area" style={{ display: 'flex', width: 'calc(100% - 200px)', position: 'fixed', bottom: 0 }}>
                 <textarea
