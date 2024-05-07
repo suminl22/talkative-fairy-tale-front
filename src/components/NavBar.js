@@ -6,6 +6,7 @@ const NavBar = () => {
   const navigate = useNavigate();
 
   const onClick = () => {
+    localStorage.removeItem('token');
     alert('로그아웃 했습니다!');
     navigate('/');
   };
