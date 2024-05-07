@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Book from '../components/Book';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import SERVER_URL from '../config';
 
 function Body() {
   const [activeTab, setActiveTab] = useState('작성중');
@@ -14,12 +15,13 @@ function Body() {
 
     const fetchStories = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/story/user/incomplete', {
+        const response = await axios.get(`${SERVER_URL}/story/user/incomplete`, {
           headers: {
             'Authorization': `${token}`
           }
         });
         let data = await response.data;
+        console.log(data);
         let index = 1;
         for (let i of data) {
           i.title = `story#${index}`;

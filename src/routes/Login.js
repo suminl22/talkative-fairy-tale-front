@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import './Login.css'; // 이 경로는 Login.css 파일의 위치에 따라 달라질 수 있습니다.
+import SERVER_URL from '../config';
 
 
 const Login = () => {
@@ -29,7 +30,7 @@ const Login = () => {
             formData.append('username', username);
             formData.append('password', password);
 
-            const response = await axios.post('35.170.146.142:8080/login', formData);
+            const response = await axios.post(`${SERVER_URL}/login`, formData);
 
             if (response.status === 200) {
                 alert("환영합니다!");
