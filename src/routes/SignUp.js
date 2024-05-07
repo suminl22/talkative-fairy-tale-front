@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import SERVER_URL from '../config';
 
 const SignUp = () => {
     // 상태 변수 정의
@@ -26,7 +27,7 @@ const SignUp = () => {
     // 회원가입 요청 보내는 함수
     const handleSignUp = async () => {
         try {
-            const response = await axios.post('35.170.146.142:8080/register/user', {
+            const response = await axios.post(`${SERVER_URL}/register/user`, {
                 username: username,
                 password: password
             });
