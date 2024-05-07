@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ChatBubble from '../components/ChatBubble';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import SERVER_URL from '../config';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
@@ -36,30 +34,6 @@ function Chat() {
         }
     }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                console.log("토큰" + localStorage.getItem('token'));
-                // 서버에 POST 요청을 보냅니다.
-                const response = await axios.post(`${SERVER_URL}/make/`, {
-                    headers: {
-                        'authorization': localStorage.getItem('token')
-                    }
-                });
-                const responseData = response.data;
-    
-                // 서버에서 받은 content를 메시지로 추가합니다.
-                const serverMessage = { text: responseData.content, isUser: false };
-                setMessages(prevMessages => [...prevMessages, serverMessage]);
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        };
-    
-        fetchData();
-    }, []);
-    
-
     const handleCompositionStart = () => {
         setIsComposing(true);
     };
@@ -78,7 +52,7 @@ function Chat() {
             } else {
                 if (!isComposing) {
                     event.preventDefault();
-                    //sendMessage();
+                    sendMessage();
                 }
             }
         }
@@ -99,32 +73,38 @@ function Chat() {
         txtarea.scrollTop = scrollPos;
     };
 
-    const sendMessage = async () => {
+    const sendMessage = () => {
         const input = document.getElementById('message-input');
         const messageText = input.value.trim();
         if (messageText !== '') {
-            try {
-                // 서버에 POST 요청을 보냅니다.
-                const response = await axios.post(`${SERVER_URL}/make/new/content`, { content: messageText }, {
-                    headers: {
-                        'Authorization': localStorage.getItem('token')
-                    }
-                });
-                const responseData = response.data;
-                console.log()
+            // 사용자의 메시지를 추가합니다.
+            const userMessage = { text: messageText, isUser: true };
+            setMessages(prevMessages => [...prevMessages, userMessage]);
 
-                // 서버에서 받은 content를 메시지로 추가합니다.
-                const serverMessage = { text: responseData.content, isUser: false };
-                setMessages(prevMessages => [...prevMessages, serverMessage]);
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-            
-            // 입력창을 초기화합니다.
+            // 가짜 응답을 추가합니다.
+            simulateComputerResponse(messageText);
+
             input.value = '';
         }
     };
-    
+
+    const simulateComputerResponse = (inputText) => {
+        const length = inputText.length;
+        const simulatedText = '가짜 응답 '.repeat(Math.ceil(length / 6)).trim();
+
+        // 가짜 응답을 생성하여 추가합니다.
+        // 1초 동안 '...'을 표시합니다.
+        const typingMessage = { text: '...', isUser: false };
+        setMessages(prevMessages => [...prevMessages, typingMessage]);
+
+        // 1초 후에 가짜 응답을 표시합니다.
+        setTimeout(() => {
+            // 가짜 응답을 생성하여 추가합니다.
+            const computerMessage = { text: simulatedText, isUser: false };
+            setMessages(prevMessages => [...prevMessages.filter(msg => msg.text !== '...'), computerMessage]);
+        }, 1000);
+    };
+
     const handleInputChange = () => {
         // 입력창의 값이 변경될 때마다 스크롤을 가장 아래로 내립니다.
         const messagesDiv = messagesRef.current;
@@ -134,10 +114,10 @@ function Chat() {
     };
 
     return (
-        <div id="container" style={{ backgroundColor: '#FFD700', display: 'flex', borderRadius: '5px' }}>
-            <div id="sidebar" style={{ height: '50px', width: '200px', backgroundColor: '#FFD700', padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px', borderRadius: '5px' }}>
+        <div id="container" style={{ backgroundColor: '#eff3f7', display: 'flex', borderRadius: '5px' }}>
+            <div id="sidebar" style={{ height: 'calc(100vh - 100px)', width: '15%', backgroundColor: '#FFD700', padding: '20px', display: 'flex', justifyContent: 'center', marginRight: '10px', borderRadius: '10px' }}>
                 <Link to="/home" style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold', fontSize: '16', position: 'fix'}}>
-                    홈으로 돌아가기
+                    돌아가기
                 </Link>
                 {/* 로그 부분은 여기에 추가 */}
             </div>
@@ -167,7 +147,7 @@ function Chat() {
                 ></textarea>
                 
                 <div style={{ width: '20px', height: '80%' }}></div> {/* 공간 추가 */}
-                {/* <button onClick={sendMessage} style={{ 
+                <button onClick={sendMessage} style={{ 
                         width: '100px',
                         height: '100%', // 입력 창과 높이를 동일하게 설정합니다.
                         marginLeft: '10px',
@@ -179,7 +159,7 @@ function Chat() {
                         color: 'black',
                         fontWeight: 'bold', // 입력 텍스트를 굵게 만듭니다.
                         fontSize: '16px', // 폰트 크기를 조정합니다.
-                    }}>입력</button> */}
+                    }}>입력</button>
             </div>
         </div>
     );
