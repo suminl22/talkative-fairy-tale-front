@@ -26,7 +26,7 @@ const SignUp = () => {
     // 회원가입 요청 보내는 함수
     const handleSignUp = async () => {
         try {
-            const response = await axios.post('https://1eb0-180-70-67-54.ngrok-free.app/register/user', {
+            const response = await axios.post('http://localhost:8080/register/user', {
                 username: username,
                 password: password
             });

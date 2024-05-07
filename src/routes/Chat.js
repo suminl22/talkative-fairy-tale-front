@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ChatBubble from '../components/ChatBubble';
+import { Link } from 'react-router-dom';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
@@ -26,7 +27,9 @@ function Chat() {
         if (messagesRef.current) {
             messagesRef.current.addEventListener('scroll', handleScroll);
             return () => {
-                messagesRef.current.removeEventListener('scroll', handleScroll);
+                if (messagesRef.current) {
+                    messagesRef.current.removeEventListener('scroll', handleScroll);
+                }
             };
         }
     }, []);
@@ -105,7 +108,7 @@ function Chat() {
     return (
         <div id="container" style={{ backgroundColor: '#FFD700' }}>
             <div id="sidebar" style={{ height: '50vh', overflowY: 'auto' }}>
-                <button className="nav-button">홈</button>
+                <Link to="/home" className="nav-button">홈</Link>
                 <button className="nav-button">설정</button>
             </div>
             <div id="chat-area" ref={messagesRef} style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>

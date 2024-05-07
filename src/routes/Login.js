@@ -29,11 +29,11 @@ const Login = () => {
             formData.append('username', username);
             formData.append('password', password);
 
-            const response = await axios.post('https://1eb0-180-70-67-54.ngrok-free.app/login', formData);
+            const response = await axios.post('http://localhost:8080/login', formData);
 
             if (response.status === 200) {
                 alert("환영합니다!");
-                saveTokenToLocalStorage(response.data.token);
+                saveTokenToLocalStorage(response.headers['authorization']);
                 navigate('/home');
             } else {
                 setError('아이디 혹은 비밀번호가 다릅니다...!');
