@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import './Login.css'; // 이 경로는 Login.css 파일의 위치에 따라 달라질 수 있습니다.
 import SERVER_URL from '../config';
 
-
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
