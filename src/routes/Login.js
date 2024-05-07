@@ -29,7 +29,7 @@ const Login = () => {
             formData.append('username', username);
             formData.append('password', password);
 
-            const response = await axios.post('https://350b-2001-2d8-7090-eed7-795b-7c87-587e-8c0d.ngrok-free.app/login', formData);
+            const response = await axios.post('https://41ca-2001-2d8-7093-7d73-9554-ef16-b5cb-4faa.ngrok-free.app/login', formData);
 
             if (response.status === 200) {
                 alert("환영합니다!");

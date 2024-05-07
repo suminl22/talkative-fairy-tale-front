@@ -14,7 +14,6 @@ body {
   background-color: #eff3f7;
   width: 100vw; /* 전체 가로 너비 사용 */
   height: 100vh; /* 전체 세로 높이 사용 */
-  overflow: hidden;
 }
 
 
@@ -143,4 +142,8 @@ a {
   margin-right: auto; /* 왼쪽 정렬 */
   margin-left: 20px; /* 왼쪽에서 공간을 조금 띄움 */
   text-align: left;
+}
+
+.fixed-width-btn {
+  width: 100px; /* Adjust the width as needed */
 }

@@ -15,7 +15,7 @@ const NavBar = () => {
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid d-flex justify-content-between align-items-center" style={{ padding: '0 2%' }}>
         <img src="src/img/logo.png" alt='이야기 놀이터 이미지' />
-        <button className="btn btn-outline-dark" type="submit" onClick={onClick}>
+        <button className="btn btn-outline-dark fixed-width-btn" type="submit" onClick={onClick}>
           Logout
         </button>
       </div>
