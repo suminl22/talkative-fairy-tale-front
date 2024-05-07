@@ -5,25 +5,31 @@ function Chat() {
     const [isComposing, setIsComposing] = useState(false);
     const [messages, setMessages] = useState([]);
     const messagesRef = useRef(null);
+    const isAtBottomRef = useRef(true); // 맨 아래로 스크롤되었는지 여부를 추적하는 ref
 
     useEffect(() => {
-        const handleScroll = () => {
-            const messages = document.querySelectorAll('.message');
-            messages.forEach(msg => {
-                if (isElementInViewport(msg)) {
-                    msg.classList.remove('fading-out');
-                } else {
-                    msg.classList.add('fading-out');
-                }
-            });
+        const scrollToBottom = () => {
+            if (messagesRef.current && isAtBottomRef.current) {
+                messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+            }
         };
-        
-        const messagesRefCopy = messagesRef.current;
-        messagesRefCopy.addEventListener('scroll', handleScroll);
-        return () => {
-            messagesRefCopy.removeEventListener('scroll', handleScroll);
-        };
-    }, []); // 빈 배열을 전달하여 최초 렌더링 시에만 실행
+
+        scrollToBottom();
+    }, [messages]);
+
+    const handleScroll = () => {
+        const { scrollTop, scrollHeight, clientHeight } = messagesRef.current;
+        isAtBottomRef.current = scrollTop + clientHeight >= scrollHeight;
+    };
+
+    useEffect(() => {
+        if (messagesRef.current) {
+            messagesRef.current.addEventListener('scroll', handleScroll);
+            return () => {
+                messagesRef.current.removeEventListener('scroll', handleScroll);
+            };
+        }
+    }, []);
 
     const handleCompositionStart = () => {
         setIsComposing(true);
@@ -71,28 +77,29 @@ function Chat() {
             // 사용자의 메시지를 추가합니다.
             const userMessage = { text: messageText, isUser: true };
             setMessages(prevMessages => [...prevMessages, userMessage]);
-    
+
             // 가짜 응답을 추가합니다.
             simulateComputerResponse(messageText);
-    
+
             input.value = '';
         }
     };
-    
+
     const simulateComputerResponse = (inputText) => {
         const length = inputText.length;
         const simulatedText = '가짜 응답 '.repeat(Math.ceil(length / 6)).trim();
-    
+
         // 가짜 응답을 생성하여 추가합니다.
         const computerMessage = { text: simulatedText, isUser: false };
         setMessages(prevMessages => [...prevMessages, computerMessage]);
     };
-    const isElementInViewport = (el) => {
-        const rect = el.getBoundingClientRect();
-        return (
-            rect.bottom > 0 &&
-            rect.top < (window.innerHeight || document.documentElement.clientHeight)
-        );
+
+    const handleInputChange = () => {
+        // 입력창의 값이 변경될 때마다 스크롤을 가장 아래로 내립니다.
+        const messagesDiv = messagesRef.current;
+        if (messagesDiv) {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
     };
 
     return (
@@ -113,10 +120,10 @@ function Chat() {
                     onKeyDown={handleKeyPress}
                     onCompositionStart={handleCompositionStart}
                     onCompositionEnd={handleCompositionEnd}
+                    onChange={handleInputChange}
                     style={{ width: 'calc(100% - 120px)', height: '80%', marginBottom: 20 }} // 입력창의 높이를 현재 크기의 80%로 설정
                 ></textarea>
                 <div style={{ width: '20px', height: '80%' }}></div> {/* 공간 추가 */}
-                <button onClick={sendMessage} style={{ width: '100px', height: '80%', marginTop: 'auto', marginBottom: '20px' }}>입력</button> {/* '입력' 버튼 */}
             </div>
             <div style={{ height: '20px' }}></div> {/* 두 컴포넌트 사이에 약간의 여백 */}
         </div>
