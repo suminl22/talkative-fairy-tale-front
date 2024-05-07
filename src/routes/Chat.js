@@ -1,28 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ChatBubble from '../components/ChatBubble';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
     const [messages, setMessages] = useState([]);
     const messagesRef = useRef(null);
     const isAtBottomRef = useRef(true); // 맨 아래로 스크롤되었는지 여부를 추적하는 ref
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const scrollToBottom = () => {
-            if (messagesRef.current && isAtBottomRef.current) {
-                messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-            }
+        const handleScroll = () => {
+            const { scrollTop, scrollHeight, clientHeight } = messagesRef.current;
+            isAtBottomRef.current = scrollTop + clientHeight >= scrollHeight;
         };
 
-        scrollToBottom();
-    }, [messages]);
-
-    const handleScroll = () => {
-        const { scrollTop, scrollHeight, clientHeight } = messagesRef.current;
-        isAtBottomRef.current = scrollTop + clientHeight >= scrollHeight;
-    };
-
-    useEffect(() => {
         if (messagesRef.current) {
             messagesRef.current.addEventListener('scroll', handleScroll);
             return () => {
@@ -41,33 +33,11 @@ function Chat() {
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
-            if (event.shiftKey) {
-                if (!isComposing) {
-                    event.preventDefault();
-                    insertAtCaret('\n');
-                }
-            } else {
-                if (!isComposing) {
-                    event.preventDefault();
-                    sendMessage();
-                }
+            if (!event.shiftKey && !isComposing) {
+                event.preventDefault();
+                sendMessage();
             }
         }
-    };
-
-    const insertAtCaret = (text) => {
-        const txtarea = document.getElementById('message-input');
-        const scrollPos = txtarea.scrollTop;
-        let caretPos = txtarea.selectionStart;
-
-        const front = txtarea.value.substring(0, caretPos);
-        const back = txtarea.value.substring(txtarea.selectionEnd, txtarea.value.length);
-        txtarea.value = front + text + back;
-        caretPos = caretPos + text.length;
-        txtarea.selectionStart = caretPos;
-        txtarea.selectionEnd = caretPos;
-        txtarea.focus();
-        txtarea.scrollTop = scrollPos;
     };
 
     const sendMessage = () => {
@@ -102,30 +72,37 @@ function Chat() {
         }
     };
 
+    const handleGoBack = () => {
+        navigate('/home'); // 홈으로 이동
+    };
+
     return (
-        <div id="container" style={{ backgroundColor: '#FFD700' }}>
-            <div id="sidebar" style={{ height: '50vh', overflowY: 'auto' }}>
-                <button className="nav-button">홈</button>
-                <button className="nav-button">설정</button>
+        <div id="container" style={{ backgroundColor: '#FFD700', display: 'flex' }}>
+            <div id="sidebar" style={{ width: '200px', backgroundColor: '#FFD700', padding: '20px' }}>
+                <Link to="/home" style={{ textDecoration: 'none' }}>
+                    <button className="nav-button" style={{ marginBottom: '20px' }}>홈</button>
+                </Link>
+                {/* 로그 부분은 여기에 추가 */}
             </div>
-            <div id="chat-area" ref={messagesRef} style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
-                {messages.map((message, index) => (
-                    <ChatBubble key={index} message={message.text} isUser={message.isUser} />
-                ))}
+            <div id="content" style={{ flex: '1', padding: '20px' }}>
+                <div id="chat-area" ref={messagesRef} style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
+                    {messages.map((message, index) => (
+                        <ChatBubble key={index} message={message.text} isUser={message.isUser} />
+                    ))}
+                </div>
+                <div id="input-area" style={{ display: 'flex', width: '100%', position: 'fixed', bottom: 0 }}>
+                    <textarea
+                        id="message-input"
+                        placeholder="다음 이야기를 입력해줘"
+                        onKeyDown={handleKeyPress}
+                        onCompositionStart={handleCompositionStart}
+                        onCompositionEnd={handleCompositionEnd}
+                        onChange={handleInputChange}
+                        style={{ width: 'calc(100% - 120px)', height: '80%', marginBottom: 20, border: 'none', outline: 'none' }} // 입력창의 높이를 현재 크기의 80%로 설정
+                    ></textarea>
+                    <button onClick={sendMessage} style={{ width: '100px', height: '40px', marginLeft: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', cursor: 'pointer' }}>입력</button>
+                </div>
             </div>
-            <div id="input-area" style={{ display: 'flex', width: 'calc(100% - 200px)', position: 'fixed', bottom: 0 }}>
-                <textarea
-                    id="message-input"
-                    placeholder="다음 이야기를 입력해줘"
-                    onKeyDown={handleKeyPress}
-                    onCompositionStart={handleCompositionStart}
-                    onCompositionEnd={handleCompositionEnd}
-                    onChange={handleInputChange}
-                    style={{ width: 'calc(100% - 120px)', height: '80%', marginBottom: 20 }} // 입력창의 높이를 현재 크기의 80%로 설정
-                ></textarea>
-                <div style={{ width: '20px', height: '80%' }}></div> {/* 공간 추가 */}
-            </div>
-            <div style={{ height: '20px' }}></div> {/* 두 컴포넌트 사이에 약간의 여백 */}
         </div>
     );
 }
