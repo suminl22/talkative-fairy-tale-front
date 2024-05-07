@@ -26,7 +26,7 @@ const SignUp = () => {
     // 회원가입 요청 보내는 함수
     const handleSignUp = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/register/user', {
+            const response = await axios.post('35.170.146.142:8080/register/user', {
                 username: username,
                 password: password
             });

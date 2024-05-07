@@ -29,7 +29,7 @@ const Login = () => {
             formData.append('username', username);
             formData.append('password', password);
 
-            const response = await axios.post('http://localhost:8080/login', formData);
+            const response = await axios.post('35.170.146.142:8080/login', formData);
 
             if (response.status === 200) {
                 alert("환영합니다!");
@@ -53,6 +53,7 @@ const Login = () => {
         <div className="login">
             <h1>Story Playground</h1>
             <span>에 오신 것을 환영합니다:)</span>
+            <div style={{height: '20px', width: '100%'}}></div>
             <div className="form-container">
                 <form onSubmit={handleSubmit}>
                     <div className="input-container">
@@ -77,6 +78,7 @@ const Login = () => {
                     <button type="submit">로그인</button>
                 </form>
             </div>
+            <div style={{height: '20px', width: '100%'}}></div>
             <div>
                 <span>처음이신가요? </span>
                 <span>
