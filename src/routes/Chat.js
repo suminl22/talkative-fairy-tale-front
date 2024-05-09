@@ -3,6 +3,7 @@ import ChatBubble from '../components/ChatBubble';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SERVER_URL from '../config';
+import storyGuidelines from './data';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
@@ -116,10 +117,14 @@ function Chat() {
                     messages: [
                         {
                             role: "system",
-                            content: "너는 어린 아이용 동화 작가야. 너는 사용자가 동화를 시작하고 싶을 때 이야기를 한 문장만 만들어 주면 돼. 그럼 사용자가 이어서 이야기의 다음 한 문장을 만들거야. 이런식으로 차근차근 이야기를 만들어 가면 돼"
+                            content: storyGuidelines.storyGuidelines
                         },
                         {
                             role: "user",
+                            content: content
+                        },
+                        {
+                            role: "assistant",
                             content: content
                         }
                     ],
