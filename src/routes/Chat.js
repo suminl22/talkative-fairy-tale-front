@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import ChatBubble from '../components/ChatBubble';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import SystemPrompting2 from '../components/S2';
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
     const [messages, setMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // 로딩 중인지 여부를 나타내는 상태 추가
     const messagesRef = useRef(null);
     const isAtBottomRef = useRef(true); // 맨 아래로 스크롤되었는지 여부를 추적하는 ref
 
@@ -16,8 +18,9 @@ function Chat() {
         const fetchFirstSentence = async () => {
             try {
                 const firstSentence = await getFirstSentence();
-                const systemMessage = { text: firstSentence, isUser: false };
+                const systemMessage = { role: "assistant", content: firstSentence };
                 setMessages(prevMessages => [...prevMessages, systemMessage]);
+                setIsLoading(false); // 응답을 받은 후 로딩 중 상태를 false로 변경
             } catch (error) {
                 console.error('Error fetching first sentence:', error);
             }
@@ -25,6 +28,7 @@ function Chat() {
     
         fetchFirstSentence();
     }, []);
+    
 
     useEffect(() => {
         const scrollToBottom = () => {
@@ -92,16 +96,17 @@ function Chat() {
     };
 
     const sendMessage = () => {
+
         const input = document.getElementById('message-input');
         const messageText = input.value.trim();
         if (messageText !== '') {
             // 이전 대화의 메시지와 사용자가 입력한 내용을 함께 전달합니다.
             const allMessages = messages.map(message => ({
-                content: message.text,
-                role: message.isUser ? 'user' : 'system'
+                content: message.content,
+                role: message.role
             }));
             // 사용자의 메시지를 추가합니다.
-            const userMessage = { text: messageText, isUser: true };
+            const userMessage = { content: messageText, role: "user" };
             setMessages(prevMessages => [...prevMessages, userMessage]);
 
             // 가짜 응답을 추가합니다.
@@ -114,7 +119,7 @@ function Chat() {
     const getFirstSentence = async () => {
         try {
             // Fetch the GPT API token
-            const tokenResponse = await axios.get('http://35.170.146.142:8080/chat-gpt/token');
+            const tokenResponse = await axios.get(`${SERVER_URL}/story/token`);
             const gptAPIToken = tokenResponse.data;
     
             // Prepare request data for GPT API with system prompt
@@ -126,6 +131,11 @@ function Chat() {
                         content: SystemPrompting1,
                     }
                 ],
+                temperature: 1,
+                max_tokens: 4096,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
             };
     
             // Send request to GPT API
@@ -147,14 +157,28 @@ function Chat() {
     };
 
     const fetchGptAPITokenAndCommunicate = (inputText, allMessages) => {
-        // Combine all input messages into a single string
-        const allInputMessages = allMessages
-            .filter(message => message.role === "user")
-            .map(message => message.content)
-            .join("\n");
+        setIsLoading(true); // API 호출 전에 로딩 상태를 true로 설정합니다.
+    
+        // 추가: 시스템 프롬프팅 메시지를 messages 배열에 추가합니다.
+        allMessages.unshift({
+            role: "system",
+            content: SystemPrompting2,
+        });
+    
+        // 이전 대화에서 사용자와 시스템이 교환한 모든 메시지를 JSON 형식으로 변환하여 messages 배열에 추가합니다.
+        const messages = allMessages.map(message => ({
+            role: message.role,
+            content: message.content
+        }));
+    
+        // 사용자의 입력 메시지를 JSON 형식으로 추가합니다.
+        messages.push({
+            role: "user",
+            content: inputText
+        });
     
         // Make a POST request to fetch the GPT API token from the server
-        axios.get('http://35.170.146.142:8080/chat-gpt/token', { inputText })
+        axios.get(`${SERVER_URL}/story/token`, { inputText })
             .then(response => {
                 const data = response.data;
                 // Assuming the token is in the 'token' field of the response data
@@ -162,22 +186,15 @@ function Chat() {
                 const gptAPIToken = data;
                 // Now you can use the token for further API requests
     
-                // Add all input messages to the content
-                const content = `${allInputMessages}\n${inputText}`;
-    
                 // Communicate with GPT API using the fetched token
                 const requestData = {
                     model: "gpt-3.5-turbo",
-                    messages: [
-                        {
-                            role: "system",
-                            content: SystemPrompting2,
-                        },
-                        {
-                            role: "user",
-                            content: content
-                        }
-                    ],
+                    messages: messages, // 변환된 메시지 배열을 전달합니다.
+                    temperature: 1,
+                    max_tokens: 4096,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0,
                 };
     
                 // Use the GPT API token to fetch the response
@@ -190,18 +207,22 @@ function Chat() {
             })
             .then(response => {
                 const data = response.data.choices[0].message.content;
-                console.log(data);
                 // Assuming the response contains the completed chat message
                 const completedMessage = data;
                 // Display the completed message in the chat bubble
-                const computerMessage = { text: completedMessage, isUser: false };
+                const computerMessage = { content: completedMessage, role: "assistant" };
                 setMessages(prevMessages => [...prevMessages, computerMessage]);
             })
             .catch(error => {
                 console.error('Error fetching GPT API token or communicating with GPT API:', error);
+                // Handle error gracefully
+            })
+            .finally(() => {
+                setIsLoading(false); // API 요청 완료 후에 로딩 상태를 false로 설정합니다.
             });
     };
-
+    
+    
     const handleInputChange = (event) => {
         // Handle input change logic here if needed
     };
@@ -216,8 +237,10 @@ function Chat() {
             </div>
             <div id="chat-area" ref={messagesRef} style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
                 {messages.map((message, index) => (
-                    <ChatBubble key={index} message={message.text} isUser={message.isUser} />
+                    <ChatBubble key={index} message={message.content} isUser={message.role === "user"} />
                 ))}
+                {/* 로딩 중인 경우 '...' 표시 */}
+                {isLoading && <ChatBubble key="loading" message="문장을 만들고 있어용..." isUser={false} />}
             </div>
             <div id="input-area" style={{ display: 'flex', width: '90%', height: '50px', position: 'fixed', bottom: 20 }}>
             <div style={{ width: '20%', height: '80%' }}></div> {/* 공간 추가 */}
