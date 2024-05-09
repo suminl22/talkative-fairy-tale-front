@@ -99,7 +99,7 @@ function Chat() {
             .join("\n");
     
         // Make a POST request to fetch the GPT API token from the server
-        axios.get('https://60529675fd73.ngrok.app/story/token', { inputText })
+        axios.get('http://35.170.146.142:8080/chat-gpt/token', { inputText })
             .then(response => {
                 const data = response.data;
                 // Assuming the token is in the 'token' field of the response data
