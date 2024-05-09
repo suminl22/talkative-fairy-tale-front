@@ -119,7 +119,7 @@ function Chat() {
     const getFirstSentence = async () => {
         try {
             // Fetch the GPT API token
-            const tokenResponse = await axios.get(`${SERVER_URL}/story/token`);
+            const tokenResponse = await axios.get(`${SERVER_URL}/chat-gpt/token`);
             const gptAPIToken = tokenResponse.data;
     
             // Prepare request data for GPT API with system prompt
@@ -178,7 +178,7 @@ function Chat() {
         });
     
         // Make a POST request to fetch the GPT API token from the server
-        axios.get(`${SERVER_URL}/story/token`, { inputText })
+        axios.get(`${SERVER_URL}/chat-gpt/token`, { inputText })
             .then(response => {
                 const data = response.data;
                 // Assuming the token is in the 'token' field of the response data
