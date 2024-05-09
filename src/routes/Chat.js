@@ -3,12 +3,28 @@ import ChatBubble from '../components/ChatBubble';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SERVER_URL from '../config';
+import SystemPrompting1 from '../components/S1';
+import SystemPrompting2 from '../components/S2';
 
 function Chat() {
     const [isComposing, setIsComposing] = useState(false);
     const [messages, setMessages] = useState([]);
     const messagesRef = useRef(null);
     const isAtBottomRef = useRef(true); // 맨 아래로 스크롤되었는지 여부를 추적하는 ref
+
+    useEffect(() => {
+        const fetchFirstSentence = async () => {
+            try {
+                const firstSentence = await getFirstSentence();
+                const systemMessage = { text: firstSentence, isUser: false };
+                setMessages(prevMessages => [...prevMessages, systemMessage]);
+            } catch (error) {
+                console.error('Error fetching first sentence:', error);
+            }
+        };
+    
+        fetchFirstSentence();
+    }, []);
 
     useEffect(() => {
         const scrollToBottom = () => {
@@ -79,17 +95,56 @@ function Chat() {
         const input = document.getElementById('message-input');
         const messageText = input.value.trim();
         if (messageText !== '') {
+            // 이전 대화의 메시지와 사용자가 입력한 내용을 함께 전달합니다.
+            const allMessages = messages.map(message => ({
+                content: message.text,
+                role: message.isUser ? 'user' : 'system'
+            }));
             // 사용자의 메시지를 추가합니다.
             const userMessage = { text: messageText, isUser: true };
             setMessages(prevMessages => [...prevMessages, userMessage]);
-    
+
             // 가짜 응답을 추가합니다.
-            fetchGptAPITokenAndCommunicate(messageText, messages); // 모든 메시지 전달
-    
+            fetchGptAPITokenAndCommunicate(messageText, allMessages); // 모든 메시지 전달
+
             input.value = '';
         }
     };
     
+    const getFirstSentence = async () => {
+        try {
+            // Fetch the GPT API token
+            const tokenResponse = await axios.get('http://35.170.146.142:8080/chat-gpt/token');
+            const gptAPIToken = tokenResponse.data;
+    
+            // Prepare request data for GPT API with system prompt
+            const requestData = {
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: SystemPrompting1,
+                    }
+                ],
+            };
+    
+            // Send request to GPT API
+            const response = await axios.post('https://api.openai.com/v1/chat/completions', requestData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${gptAPIToken}`
+                }
+            });
+    
+            // Extract and return the completed message from the response
+            const completedMessage = response.data.choices[0].message.content;
+            return completedMessage;
+        } catch (error) {
+            console.error('Error fetching GPT API token or communicating with GPT API:', error);
+            // Handle error gracefully
+            return null;
+        }
+    };
 
     const fetchGptAPITokenAndCommunicate = (inputText, allMessages) => {
         // Combine all input messages into a single string
@@ -116,7 +171,7 @@ function Chat() {
                     messages: [
                         {
                             role: "system",
-                            content: "너는 어린 아이용 동화 작가야. 너는 사용자가 동화를 시작하고 싶을 때 이야기를 한 문장만 만들어 주면 돼. 그럼 사용자가 이어서 이야기의 다음 한 문장을 만들거야. 이런식으로 차근차근 이야기를 만들어 가면 돼"
+                            content: SystemPrompting2,
                         },
                         {
                             role: "user",
